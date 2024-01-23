@@ -1,0 +1,4 @@
+secure-smtplib
+pyttsx3
+playsound
+flask
