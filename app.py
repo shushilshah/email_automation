@@ -20,14 +20,18 @@ def system(text):
 def mic():
     with sr.Microphone() as source:
         print("listening.......")
-        voice = listener.listen(source)
-        data = listener.recognize_google(voice)
-        print(data)
-        return data.lower()
+        try:
+            voice = listener.listen(source, timeout=5)
+            data = listener.recognize_google(voice)
+            print(data)
+            return data.lower()
+        except sr.UnknownValueError:
+            print("can not understand the sound.")
+            return ""
 
 
 # list of email of receiver
-dict = {"username": "email of receiver"}
+email_dict = {"username": "email of receiver"}
 
 
 def send_email(receiver, subject, body):
@@ -45,13 +49,22 @@ def send_email(receiver, subject, body):
 def main():
     system("To whom the email sent")
     name = mic()
-    receiver = dict[name]
-    system("subject of email")
-    subject = mic()
-    system("body of email")
-    body = mic()
-    send_email(receiver, subject, body)
-    mic("The email has been successfully sent.")
+
+    if name in email_dict:
+        receiver = email_dict[name]
+        system("subject of email")
+        subject = mic()
+        system("Body of email")
+        body = mic()
+
+        if subject and body:
+            send_email(receiver, subject, body)
+            system("Your email has been successfully sent.")
+        else:
+            system('Email subject or body is empty. Please try again.')
+    else:
+        system("Recipient email not found in the database. Please provide valid email.")
 
 
-main()
+if __name__ == "__main__":
+    main()
